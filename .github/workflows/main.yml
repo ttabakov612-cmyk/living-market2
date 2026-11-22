@@ -12,6 +12,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Unpack mod archive
+        run: |
+          ZIP_FILE=$(ls -t *.zip | head -n 1)
+          echo "Unpacking: $ZIP_FILE"
+          mkdir -p mod_build
+          unzip -o "$ZIP_FILE" -d mod_build
+
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
@@ -24,10 +31,11 @@ jobs:
           gradle-version: '8.1.1'
 
       - name: Build Mod JAR
+        working-directory: mod_build
         run: gradle build --no-daemon
 
       - name: Upload Ready JAR
         uses: actions/upload-artifact@v4
         with:
           name: LivingMarket-2.0.0-Forge-1.20.1
-          path: build/libs/*.jar
+          path: mod_build/build/libs/*.jar
